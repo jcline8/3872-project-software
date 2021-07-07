@@ -21,15 +21,20 @@
 float NOTES[] = {C, REST, C, REST, C, REST, D, REST, E, REST, E, REST, D, REST, E, REST, F, REST, G, REST, HIGH_C, REST, HIGH_C, REST, HIGH_C, REST, G, REST, G, REST, G, REST, E, REST, E, REST, E, REST, C, REST, C, REST, C, REST, G, REST, F, REST, E, REST, D, REST, C, REST};
 int BEATS[] = {2, 1, 2, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 5, 1};
 
-float* reference_signal;
-float* create_reference();
+void create_song(float*, int*, int*);
+void create_signal(float*, int*, int*);
 
 bool find_tempo();
 bool sync_time();
 
 void setup() {
   // put your setup code here, to run once:
-  reference_signal = create_reference();
+  float frequency_hz[SONG_LENGTH];
+  int cumulative_duration[SONG_LENGTH];
+  int* time_s;
+  
+  create_song(frequency_hz, cumulative_duration, time_s);
+  create_signal(frequency_hz, cumulative_duration, time_s);
 }
 
 void loop() {
@@ -37,35 +42,35 @@ void loop() {
 
 }
 
-float* create_reference() {
-  float frequency_hz[SONG_LENGTH];
+void create_song(float* frequency_hz, int* cumulative_duration, int* time_s) {
   int duration_s[SONG_LENGTH];
 
   for (int i = 0; i < SONG_LENGTH; i++) {
     frequency_hz[i] = NOTES[i];
     duration_s[i] = BEATS[i] * SONG_TEMPO;
   }
-
-  int cum_duration[SONG_LENGTH];
-  cum_duration[0] = duration_s[0];
-  int total_duration = cum_duration[0];
+  
+  cumulative_duration[0] = duration_s[0];
+  int total_duration = cumulative_duration[0];
 
   for (int i = 1; i < SONG_LENGTH; i++) {
-    cum_duration[i] = duration_s[i] + cum_duration[i -1];
-    if (cum_duration[i] > total_duration) {
-      total_duration = cum_duration[i];
+    cumulative_duration[i] = duration_s[i] + cumulative_duration[i -1];
+    if (cumulative_duration[i] > total_duration) {
+      total_duration = cumulative_duration[i];
     }
   }
 
   int fs_Hz = FS_KHZ * 1000;
   int length_time_s = (total_duration * fs_Hz) + 1;
-  int time_s[length_time_s];
+  time_s = new int[length_time_s];
   
   time_s[0] = 0;
   for (int i = 1; i < length_time_s; i++) {
     time_s[i] = time_s[i - 1] + 1/fs_Hz;
   }
   time_s[length_time_s - 1] = total_duration;
+}
 
+void create_signal(float* frequency_hz, int* cumulative_duration, int* time_s) {
   
 }
