@@ -1,14 +1,20 @@
 enum modes{INIT, MOTION, SOUND, LIGHTS};
 
-volatile modes mode = INIT;
+modes mode = INIT;
+float pot_val = 0.0;
+
+const float max_pot_val = 1023.0;
 const byte mode_pin = 2;
+const int pot_pin = A0;
 
 void mode_handler();
 void get_next_mode();
+
 void init_mode();
 void motion_mode();
 void sound_mode();
 void lights_mode();
+
 void pin_setup();
 void serial_setup();
 
@@ -18,6 +24,8 @@ void setup() {
 }
 
 void loop() {
+  pot_val = analogRead(pot_pin) / max_pot_val;
+  
   switch (mode) {
     case INIT:
       init_mode();
@@ -34,6 +42,8 @@ void loop() {
     default:
       break;
   }
+
+  delay(100);
 }
 
 void serial_setup() {
@@ -44,6 +54,7 @@ void serial_setup() {
 void pin_setup() {
   pinMode(mode_pin, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(mode_pin), mode_handler, FALLING);
+  pinMode(pot_pin, INPUT);
 }
 
 void mode_handler() {
