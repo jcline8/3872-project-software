@@ -67,7 +67,9 @@ void loop() {
       motion_mode();
       break;
     case SOUND:
-      blink_orange(2);
+      if (!note_idx) {
+        blink_orange(2);
+      }
       sound_mode();
       break;
     case LIGHTS:
@@ -148,7 +150,10 @@ void init_mode() {
 }
 
 void motion_mode() {
-  
+  digitalWrite(motor_pin, HIGH);
+  delay(250);
+  digitalWrite(motor_pin, LOW);
+  delay(10);
 }
 
 void sound_mode() {
