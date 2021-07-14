@@ -37,6 +37,7 @@ void mode_handler();
 void get_next_mode();
 void mode_transition();
 void blink_orange(int);
+void write_RGB(uint8_t, uint8_t, uint8_t);
 
 void init_mode();
 void motion_mode();
@@ -44,27 +45,33 @@ void sound_mode();
 void lights_mode();
 
 void pin_setup();
+void pin_init();
 void serial_setup();
 
 void setup() {
   serial_setup();
   pin_setup();
+  pin_init();
 }
 
 void loop() {
   pot_val = analogRead(pot_pin) / max_pot_val;
-  
+  write_RGB(HIGH, HIGH, HIGH);
+
   switch (mode) {
     case INIT:
       init_mode();
       break;
     case MOTION:
+      blink_orange(1);
       motion_mode();
       break;
     case SOUND:
+      blink_orange(2);
       sound_mode();
       break;
     case LIGHTS:
+      blink_orange(3);
       lights_mode();
       break;
     default:
@@ -90,7 +97,9 @@ void pin_setup() {
   pinMode(green_pin, OUTPUT);
   pinMode(red_pin, OUTPUT);
   pinMode(orange_pin, OUTPUT);
+}
 
+void pin_init() {
   digitalWrite(blue_pin, HIGH);
   digitalWrite(green_pin, HIGH);
   digitalWrite(red_pin, HIGH);
@@ -107,22 +116,17 @@ void mode_handler() {
 }
 
 void get_next_mode() {
-    mode_transition();
-    
     switch (mode) {
     case INIT:
       Serial.println("Entering manual motion mode.");
-      blink_orange(1);
       mode = MOTION;
       break;
     case MOTION:
       Serial.println("Entering manual sound mode.");
-      blink_orange(2);
       mode = SOUND;
       break;
     case SOUND:
       Serial.println("Entering manual lights mode.");
-      blink_orange(3);
       mode = LIGHTS;
       break;
     case LIGHTS:
@@ -152,7 +156,7 @@ void sound_mode() {
   int current_octive = ceil(pot_val * max_octive);
   unsigned int note = floor(notes[note_idx] * pow(2, current_octive));
   tone(speaker_pin, note, note_duration);
-  delay(500);
+  delay(250);
   note_idx++;
   if (note_idx >= song_length) {
     note_idx = 0;
@@ -160,16 +164,32 @@ void sound_mode() {
 }
 
 void lights_mode() {
-  
-}
+  for (int i = 1; i < 7; i++) {
+    switch (i) {
+      case 1:
+        write_RGB(HIGH, HIGH, LOW);
+        break;
+      case 2:
+        write_RGB(HIGH, LOW, HIGH);
+        break;
+      case 3:
+        write_RGB(HIGH, LOW, LOW);
+        break;
+      case 4:
+        write_RGB(LOW, HIGH, HIGH);
+        break;
+      case 5:
+        write_RGB(LOW, HIGH, LOW);
+        break;
+      case 6:
+        write_RGB(LOW, LOW, HIGH);
+        break;
+      default:
+        break;
+    }
 
-void mode_transition() {
-  digitalWrite(blue_pin, HIGH);
-  digitalWrite(green_pin, HIGH);
-  digitalWrite(red_pin, HIGH);
-  digitalWrite(orange_pin, LOW);
-
-  note_idx = 0;
+    delay(250);
+  }
 }
 
 void blink_orange(int c) {
@@ -179,4 +199,10 @@ void blink_orange(int c) {
     digitalWrite(orange_pin, LOW);
     delay(250);
   }
+}
+
+void write_RGB(uint8_t r, uint8_t g, uint8_t b) {
+  digitalWrite(red_pin, r);
+  digitalWrite(blue_pin, g);
+  digitalWrite(green_pin, b);
 }
