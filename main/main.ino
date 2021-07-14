@@ -56,7 +56,8 @@ void setup() {
 
 void loop() {
   pot_val = analogRead(pot_pin) / max_pot_val;
-  
+  write_RGB(HIGH, HIGH, HIGH);
+
   switch (mode) {
     case INIT:
       init_mode();
@@ -115,8 +116,6 @@ void mode_handler() {
 }
 
 void get_next_mode() {
-    mode_transition();
-    
     switch (mode) {
     case INIT:
       Serial.println("Entering manual motion mode.");
@@ -157,7 +156,7 @@ void sound_mode() {
   int current_octive = ceil(pot_val * max_octive);
   unsigned int note = floor(notes[note_idx] * pow(2, current_octive));
   tone(speaker_pin, note, note_duration);
-  delay(500);
+  delay(250);
   note_idx++;
   if (note_idx >= song_length) {
     note_idx = 0;
@@ -189,13 +188,8 @@ void lights_mode() {
         break;
     }
 
-    delay(1000);
+    delay(250);
   }
-}
-
-void mode_transition() {
-  write_RGB(HIGH, HIGH, HIGH);
-  note_idx = 0;
 }
 
 void blink_orange(int c) {
