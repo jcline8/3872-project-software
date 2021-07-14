@@ -63,7 +63,9 @@ void loop() {
       init_mode();
       break;
     case MOTION:
-      blink_orange(1);
+      if (!note_idx) {
+        blink_orange(1);
+      }
       motion_mode();
       break;
     case SOUND:
