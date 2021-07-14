@@ -154,7 +154,7 @@ void sound_mode() {
   tone(speaker_pin, note, note_duration);
   delay(500);
   note_idx++;
-  if (note_idx > (song_length - 1)) {
+  if (note_idx >= song_length) {
     note_idx = 0;
   }
 }
